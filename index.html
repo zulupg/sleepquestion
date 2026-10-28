@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sleep Disorders Questionnaire</title>
+    <style>
+      :root {
+        --bg: #e9ecef;
+        --paper: #ffffff;
+        --line: #000;
+        --text: #000;
+        --navy: #00263e;
+        --blue: #4472c4;
+        --red: #d90000;
+        --muted: #333;
+        --shade: #f1f1f1;
+
+        /* score colour scheme */
+        --lv-none-fg: #6b6b6b;  --lv-none-bg: #eeeeee;
+        --lv-ok-fg: #1b6e2f;    --lv-ok-bg: #dff3e2;
+        --lv-ok2-fg: #4b7a12;   --lv-ok2-bg: #eaf5d3;
+        --lv-warn-fg: #8a6100;  --lv-warn-bg: #fff1c2;
+        --lv-high-fg: #a84300;  --lv-high-bg: #ffe0c7;
+        --lv-severe-fg: #a30f0f; --lv-severe-bg: #fddada;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Times New Roman", Times, serif;
+        font-size: 13px;
+      }
+
+      body { padding: 20px; }
+
+      .page {
+        width: 100%;
+        max-width: 860px;
+        margin: 0 auto;
+        background: var(--paper);
+        padding: 28px 36px 32px;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+      }
+
+      /* ---------- Header band ---------- */
+      .band {
+        background: var(--navy);
+        color: #fff;
+        text-align: center;
+        font-weight: 700;
+        font-size: 24px;
+        letter-spacing: 0.02em;
+        padding: 6px 10px;
+        margin: 0;
+      }
+
+      .sheet-title {
+        text-align: center;
+        margin: 14px 0 12px;
+      }
+      .sheet-title h2 {
+        margin: 0;
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      .sheet-title p {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .sheet-title {
+        position: relative;
+        min-height: 92px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .sheet-title .logo {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 90px;
+        width: auto;
+      }
+
+      .sheet-head + .sheet-title { margin-top: 14px; }
+      .page-break { margin-top: 36px; }
+
+      .section-title {
+        font-weight: 700;
+        font-size: 13px;
+        margin: 18px 0 8px;
+      }
+      .section-title .num { display: inline-block; min-width: 42px; }
+
+      p.intro { margin: 6px 0 10px; line-height: 1.35; font-size: 13px; }
+      .note-line { margin: 2px 0 6px; font-size: 12px; }
+
+      /* ---------- Tables ---------- */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      th, td {
+        border: 1px solid var(--line);
+        padding: 3px 6px;
+        font-size: 12px;
+        vertical-align: middle;
+        font-weight: 400;
+        text-align: left;
+      }
+      th { font-weight: 700; text-align: center; }
+
+      td.c, th.c { text-align: center; }
+      td.num { width: 28px; text-align: left; }
+      td.blank { background: var(--shade); }
+
+      /* fields inside cells */
+      .fld { display: flex; align-items: center; gap: 6px; }
+      .fld .lbl { white-space: nowrap; }
+      td input[type="text"],
+      td input[type="date"],
+      td input[type="time"],
+      td input[type="email"],
+      td input[type="tel"] {
+        flex: 1;
+        width: 100%;
+        min-width: 0;
+        border: none;
+        border-bottom: 1px dotted #888;
+        background: transparent;
+        font-family: inherit;
+        font-size: 12px;
+        padding: 2px 3px;
+        outline: none;
+      }
+      td input:focus { background: #fff9d6; }
+
+      .opt {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        width: 100%;
+      }
+      .opt input { width: 14px; height: 14px; margin: 0; }
+      .chk { display: inline-flex; align-items: center; gap: 6px; }
+      .chk input { width: 13px; height: 13px; margin: 0; }
+
+      .purpose-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 10px;
+        padding: 2px 0;
+      }
+
+      /* ---------- Score labels / values ---------- */
+      .blue { color: var(--blue); font-weight: 700; }
+      .redhead { color: var(--red); font-weight: 700; font-size: 17px; text-align: center; }
+
+      .score {
+        display: inline-block;
+        min-width: 56px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 2px 10px;
+        border: 2px solid currentColor;
+        border-radius: 4px;
+        background: var(--lv-none-bg);
+        color: var(--lv-none-fg);
+        transition: background 0.2s, color 0.2s;
+      }
+      .badge {
+        display: inline-block;
+        margin-left: 10px;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        background: var(--lv-none-bg);
+        color: var(--lv-none-fg);
+      }
+      [data-level="ok"]     { background: var(--lv-ok-bg);     color: var(--lv-ok-fg); }
+      [data-level="ok2"]    { background: var(--lv-ok2-bg);    color: var(--lv-ok2-fg); }
+      [data-level="warn"]   { background: var(--lv-warn-bg);   color: var(--lv-warn-fg); }
+      [data-level="high"]   { background: var(--lv-high-bg);   color: var(--lv-high-fg); }
+      [data-level="severe"] { background: var(--lv-severe-bg); color: var(--lv-severe-fg); }
+      [data-level="none"]   { background: var(--lv-none-bg);   color: var(--lv-none-fg); }
+
+      /* legend rows – colour dot + highlight when active */
+      .legend { line-height: 1.9; }
+      .legend .row {
+        display: flex;
+        gap: 14px;
+        padding: 0 6px;
+        border-radius: 3px;
+        border-left: 5px solid transparent;
+      }
+      .legend .row b { min-width: 54px; }
+      .legend .row[data-lv="ok"]     { border-left-color: #2e9e48; }
+      .legend .row[data-lv="ok2"]    { border-left-color: #8bc34a; }
+      .legend .row[data-lv="warn"]   { border-left-color: #f2b600; }
+      .legend .row[data-lv="high"]   { border-left-color: #ef7a1a; }
+      .legend .row[data-lv="severe"] { border-left-color: #d62828; }
+      .legend .row.active { font-weight: 700; }
+      .legend .row.active[data-lv="ok"]     { background: var(--lv-ok-bg); }
+      .legend .row.active[data-lv="ok2"]    { background: var(--lv-ok2-bg); }
+      .legend .row.active[data-lv="warn"]   { background: var(--lv-warn-bg); }
+      .legend .row.active[data-lv="high"]   { background: var(--lv-high-bg); }
+      .legend .row.active[data-lv="severe"] { background: var(--lv-severe-bg); }
+
+      /* ---------- PSQI scoring ---------- */
+      .comp { margin-top: -1px; }
+      .comp th.ct {
+        text-align: left;
+        font-size: 13px;
+        padding: 5px 10px;
+        background: #fff;
+      }
+      .comp td { vertical-align: top; font-size: 12px; padding: 8px 10px; line-height: 1.75; }
+      .comp .u { font-weight: 700; text-decoration: underline; display: block; line-height: 1.5; margin-top: 2px; }
+      .comp .cscore { text-align: right; margin-top: 4px; }
+      .comp .formula { font-size: 12px; font-weight: 400; margin-top: 3px; }
+      .eff-out { font-size: 12px; margin-right: 14px; color: var(--muted); }
+
+      .subsum { font-weight: 700; text-decoration: none; display: inline-block; color: var(--blue); }
+      .comp .li { padding: 0 8px; border-radius: 3px; border-left: 4px solid transparent; }
+      .comp .li.on { font-weight: 700; border-left-color: currentColor; }
+
+      .global-row td { padding: 8px 10px; font-size: 13px; }
+
+      /* ---------- Toolbar ---------- */
+      button { cursor: pointer; font-family: Arial, Helvetica, sans-serif; }
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin: 22px 0 4px;
+        flex-wrap: wrap;
+      }
+      .toolbar button {
+        padding: 8px 16px;
+        border: 1px solid var(--navy);
+        background: #dfeaf7;
+        color: var(--navy);
+        font-weight: 700;
+        border-radius: 3px;
+      }
+      .toolbar button.secondary { background: #f4f4f4; }
+      .toolbar button.accent { background: var(--navy); color: #fff; }
+
+      @media print {
+        body { padding: 0; background: white; }
+        .page { box-shadow: none; max-width: none; margin: 0; padding: 0; }
+        .toolbar { display: none !important; }
+        .band, .score, .badge, .legend .row, [data-level] {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .page-break { break-before: page; margin-top: 0; }
+        table, tr { break-inside: avoid; }
+      }
+
+      @media (max-width: 760px) {
+        body { padding: 6px; }
+        .page { padding: 14px 10px 20px; }
+        .band { font-size: 18px; }
+        .purpose-grid { grid-template-columns: 1fr; }
+        .sheet-title { min-height: 0; }
+        .sheet-title .logo { position: static; display: block; margin: 0 auto 6px; height: 72px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+
+      <!-- ===================== SHEET 1 ===================== -->
+      <h1 class="band">SLEEP QUALITY ASSESSMENT</h1>
+      <div class="sheet-title"><img class="logo" alt="Roadrunners Medical Consultants" />
+        <h2>SLEEP DISORDERS QUESTIONNAIRE</h2>
+        <p>(To be completed by employee)</p>
+      </div>
+
+      <div class="section-title" style="margin-bottom:2px;">1.00 Driver/Operator Information</div>
+      <p class="note-line">(Health professional completes this section)</p>
+
+      <table>
+        <colgroup>
+          <col style="width:46%" /><col style="width:16%" /><col style="width:22%" /><col style="width:16%" />
+        </colgroup>
+        <tr>
+          <td>Fitness to Drive (FTD) Health Assessment:</td>
+          <td><div class="fld"><span class="lbl">Date:</span><input type="date" name="date" /></div></td>
+          <td><div class="fld"><span class="lbl">Time:</span><input type="time" name="time" /><span class="lbl">am/pm</span></div></td>
+          <td><label class="chk"><input type="checkbox" name="not_applicable" /> Not applicable</label></td>
+        </tr>
+        <tr>
+          <td colspan="4"><div class="fld"><span class="lbl">Occupational Health Clinic:</span><input type="text" name="occupational_health_clinic" /></div></td>
+        </tr>
+        <tr>
+          <td>Purpose of Health Assessment:</td>
+          <td colspan="3">
+            <div class="purpose-grid">
+              <label class="chk"><input type="checkbox" name="purpose" value="Certification" /> Certification</label>
+              <label class="chk"><input type="checkbox" name="purpose" value="Sleep Assessment" /> Sleep Assessment</label>
+              <label class="chk"><input type="checkbox" name="purpose" value="Recertification" /> Recertification</label>
+              <label class="chk"><input type="checkbox" name="purpose" value="Return-to-Duty" /> Return-to-Duty</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="fld"><span class="lbl">CMV Driver License No.</span><input type="text" name="driver_license_no" /></div></td>
+          <td colspan="3"><div class="fld"><span class="lbl">License Class:</span><input type="text" name="license_class" /></div></td>
+        </tr>
+        <tr>
+          <td><div class="fld"><span class="lbl">CMV Category:</span><input type="text" name="cmv_category" /></div></td>
+          <td colspan="3"><div class="fld"><span class="lbl">Permit Type:</span><input type="text" name="permit_type" /></div></td>
+        </tr>
+        <tr>
+          <td colspan="4"><div class="fld"><span class="lbl">Driving route:</span><input type="text" name="driving_route" /></div></td>
+        </tr>
+      </table>
+
+      <table style="margin-top:22px;">
+        <colgroup><col style="width:33%" /><col style="width:33%" /><col style="width:34%" /></colgroup>
+        <tr>
+          <td><div class="fld"><span class="lbl">Name:</span><input type="text" name="name" /></div></td>
+          <td><div class="fld"><span class="lbl">Age/Sex:</span><input type="text" name="age_sex" /></div></td>
+          <td><div class="fld"><span class="lbl">Work ID No.:</span><input type="text" name="work_id" /></div></td>
+        </tr>
+        <tr>
+          <td><div class="fld"><span class="lbl">Job Title:</span><input type="text" name="job_title" /></div></td>
+          <td><div class="fld"><span class="lbl">Department:</span><input type="text" name="department" /></div></td>
+          <td><div class="fld"><span class="lbl">Work Site:</span><input type="text" name="work_site" /></div></td>
+        </tr>
+        <tr>
+          <td><div class="fld"><span class="lbl">DOB:</span><input type="date" name="dob" /></div></td>
+          <td><div class="fld"><span class="lbl">Email:</span><input type="email" name="email" /></div></td>
+          <td><div class="fld"><span class="lbl">Work Phone:</span><input type="tel" name="work_phone" /></div></td>
+        </tr>
+      </table>
+
+      <div class="section-title" style="margin-top:22px;">1.10 &nbsp;Employer Information</div>
+      <table>
+        <colgroup><col style="width:60%" /><col style="width:40%" /></colgroup>
+        <tr><td colspan="2"><div class="fld"><span class="lbl">Employer:</span><input type="text" name="employer" /></div></td></tr>
+        <tr><td colspan="2"><div class="fld"><span class="lbl">Address:</span><input type="text" name="address" /></div></td></tr>
+        <tr>
+          <td><div class="fld"><span class="lbl">Contact name:</span><input type="text" name="contact_name" /></div></td>
+          <td><div class="fld"><span class="lbl">Phone:</span><input type="tel" name="contact_phone" /></div></td>
+        </tr>
+        <tr><td colspan="2"><div class="fld"><span class="lbl">Contact email address:</span><input type="email" name="contact_email" /></div></td></tr>
+      </table>
+
+      <!-- ===================== SHEET 2 ===================== -->
+      <div class="sheet-head page-break">
+        <div class="band">SLEEP QUALITY ASSESSMENT</div>
+        <div class="sheet-title"><img class="logo" alt="Roadrunners Medical Consultants" />
+          <h2>SLEEP DISORDERS QUESTIONNAIRE</h2>
+          <p>(To be completed by employee)</p>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="num">2.00</span>Epworth Sleepiness Scale (ESS)</div>
+      <p class="intro">The Epworth Sleepiness Scale is used to determine the level of daytime sleepiness. Use the grading scale to choose the most appropriate number for each situation:</p>
+
+      <table>
+        <colgroup>
+          <col style="width:5%" /><col style="width:37%" /><col style="width:14.5%" /><col style="width:14.5%" /><col style="width:14.5%" /><col style="width:14.5%" />
+        </colgroup>
+        <tr>
+          <td colspan="2" style="padding:10px 8px;">How likely are you to doze off or fall asleep in the following situations?</td>
+          <th colspan="4" style="padding:10px;">Grading Scale</th>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding:6px 8px;">Grade your answer by circling one number for each of the following questions:</td>
+          <th>Never</th><th>Slight</th><th>Moderate</th><th>High</th>
+        </tr>
+        <tr><td class="num">1</td><td>Sitting and reading</td><td class="c"><label class="opt"><input type="radio" name="ess_1" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_1" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_1" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_1" value="3" />3</label></td></tr>
+        <tr><td class="num">2</td><td>Watching television</td><td class="c"><label class="opt"><input type="radio" name="ess_2" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_2" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_2" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_2" value="3" />3</label></td></tr>
+        <tr><td class="num">3</td><td>Sitting inactive in a public place</td><td class="c"><label class="opt"><input type="radio" name="ess_3" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_3" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_3" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_3" value="3" />3</label></td></tr>
+        <tr><td class="num">4</td><td>As a passenger in a car for an hour without a break</td><td class="c"><label class="opt"><input type="radio" name="ess_4" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_4" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_4" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_4" value="3" />3</label></td></tr>
+        <tr><td class="num">5</td><td>Lying down to rest in the afternoon</td><td class="c"><label class="opt"><input type="radio" name="ess_5" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_5" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_5" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_5" value="3" />3</label></td></tr>
+        <tr><td class="num">6</td><td>Sitting and talking to someone</td><td class="c"><label class="opt"><input type="radio" name="ess_6" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_6" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_6" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_6" value="3" />3</label></td></tr>
+        <tr><td class="num">7</td><td>Sitting quietly after lunch without alcohol</td><td class="c"><label class="opt"><input type="radio" name="ess_7" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_7" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_7" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_7" value="3" />3</label></td></tr>
+        <tr><td class="num">8</td><td>In a car stopped for a few minutes in traffic</td><td class="c"><label class="opt"><input type="radio" name="ess_8" value="0" />0</label></td><td class="c"><label class="opt"><input type="radio" name="ess_8" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="ess_8" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="ess_8" value="3" />3</label></td></tr>
+        <tr>
+          <td colspan="2"><span class="blue">Total Epworth Score</span></td>
+          <td colspan="4"><span class="score" id="essScore" data-level="none">0</span><span class="badge" id="essBand" data-level="none">Not answered</span></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="vertical-align:top;">
+            <div class="legend" id="essLegend">
+              <div class="row" data-lv="ok"     data-min="0"  data-max="5"><b>0 – 5</b><span>Lower Normal Daytime Sleepiness</span></div>
+              <div class="row" data-lv="ok2"    data-min="6"  data-max="10"><b>6 – 10</b><span>Higher Normal Daytime Sleepiness</span></div>
+              <div class="row" data-lv="warn"   data-min="11" data-max="12"><b>11 – 12</b><span>Mild Excessive Daytime Sleepiness</span></div>
+            </div>
+          </td>
+          <td colspan="4" style="vertical-align:top;">
+            <div class="legend" id="essLegend2">
+              <div class="row" data-lv="high"   data-min="13" data-max="15"><b>13 – 15</b><span>Moderate Excessive Daytime Sleepiness</span></div>
+              <div class="row" data-lv="severe" data-min="16" data-max="24"><b>16 – 24</b><span>Severe Excessive Daytime Sleepiness</span></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="section-title" style="margin-top:22px;"><span class="num">3.00</span>STOP-BANG Sleep Apnoea Questionnaire</div>
+      <p class="intro">The STOP-BANG Sleep Questionnaire is a screening tool used to identify Obstructive Sleep Apnoea (OSA) in high-risk individuals. Circle either <b>Yes</b> or <b>No</b> for each question below.</p>
+
+      <table>
+        <colgroup><col style="width:84%" /><col style="width:8%" /><col style="width:8%" /></colgroup>
+        <tr><td>Do you <b>SNORE</b> loudly (louder than talking or loud enough to be heard through closed doors)?</td><td class="c"><label class="opt"><input type="radio" name="stop_1" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_1" value="No" />No</label></td></tr>
+        <tr><td>Do you often feel <b>TIRED</b>, fatigued, or sleepy during daytime?</td><td class="c"><label class="opt"><input type="radio" name="stop_2" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_2" value="No" />No</label></td></tr>
+        <tr><td>Has anyone <b>OBSERVED</b> you stop breathing during your sleep?</td><td class="c"><label class="opt"><input type="radio" name="stop_3" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_3" value="No" />No</label></td></tr>
+        <tr><td>Do you have or are you being treated for high blood <b>PRESSURE</b>?</td><td class="c"><label class="opt"><input type="radio" name="stop_4" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_4" value="No" />No</label></td></tr>
+        <tr><td><b>BMI</b> more than 35 kg/m<sup>2</sup></td><td class="c"><label class="opt"><input type="radio" name="stop_5" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_5" value="No" />No</label></td></tr>
+        <tr><td><b>AGE</b> over 50 years old?</td><td class="c"><label class="opt"><input type="radio" name="stop_6" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_6" value="No" />No</label></td></tr>
+        <tr><td><b>NECK</b> circumference greater than 40 cm?</td><td class="c"><label class="opt"><input type="radio" name="stop_7" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_7" value="No" />No</label></td></tr>
+        <tr><td><b>GENDER:</b> Male?</td><td class="c"><label class="opt"><input type="radio" name="stop_8" value="Yes" />Yes</label></td><td class="c"><label class="opt"><input type="radio" name="stop_8" value="No" />No</label></td></tr>
+        <tr>
+          <td><span class="blue">Total Score</span></td>
+          <td colspan="2" class="c"><span class="score" id="stopBangScore" data-level="none">0</span></td>
+        </tr>
+        <tr><td colspan="3"><span class="blue">Scoring Criteria</span><span class="badge" id="stopBand" data-level="none">Not answered</span></td></tr>
+        <tr>
+          <td colspan="3" style="padding:0;">
+            <table style="border:none;">
+              <colgroup><col style="width:70%" /><col style="width:30%" /></colgroup>
+              <tr class="stop-legend" data-lv="ok"     data-min="0" data-max="2"><td style="border:none;border-left:5px solid #2e9e48;"><b>Low risk</b> of Obstructive Sleep Apnoea (OSA)</td><td style="border:none;"><b>Yes</b> to 0 – 2 questions</td></tr>
+              <tr class="stop-legend" data-lv="warn"   data-min="3" data-max="4"><td style="border:none;border-left:5px solid #f2b600;"><b>Intermediate risk</b> of Obstructive Sleep Apnoea (OSA)</td><td style="border:none;"><b>Yes</b> to 3 – 4 questions</td></tr>
+              <tr class="stop-legend" data-lv="severe" data-min="5" data-max="8"><td style="border:none;border-left:5px solid #d62828;"><b>High risk</b> of Obstructive Sleep Apnoea (OSA)</td><td style="border:none;"><b>Yes</b> to 5 – 8 questions</td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <!-- ===================== SHEET 3 ===================== -->
+      <div class="page-break"></div>
+
+      <div class="section-title"><span class="num">4.00</span>Insomnia Severity Index (ISI)</div>
+      <p class="intro">The Insomnia Severity Index is designed to assess the nature, severity and impact of insomnia and monitor treatment response in adults.</p>
+
+      <table>
+        <colgroup>
+          <col style="width:5%" /><col style="width:37%" /><col style="width:11.6%" /><col style="width:11.6%" /><col style="width:11.6%" /><col style="width:11.6%" /><col style="width:11.6%" />
+        </colgroup>
+        <tr>
+          <td colspan="2" rowspan="2" style="vertical-align:top;padding:6px 8px;">Grade your answer by circling one number for each of the following questions:</td>
+          <th colspan="5" style="padding:6px;">Grading Scale</th>
+        </tr>
+        <tr><th>Never</th><th>Rarely</th><th>Occasionally</th><th>Most Nights/Days</th><th>Always</th></tr>
+        <tr><td class="num">1</td><td>Do you have difficulty falling asleep?</td><td class="c"><label class="opt"><input type="radio" name="isi_1" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="isi_1" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="isi_1" value="3" />3</label></td><td class="c"><label class="opt"><input type="radio" name="isi_1" value="4" />4</label></td><td class="c"><label class="opt"><input type="radio" name="isi_1" value="5" />5</label></td></tr>
+        <tr><td class="num">2</td><td>Do you have difficulty staying asleep?</td><td class="c"><label class="opt"><input type="radio" name="isi_2" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="isi_2" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="isi_2" value="3" />3</label></td><td class="c"><label class="opt"><input type="radio" name="isi_2" value="4" />4</label></td><td class="c"><label class="opt"><input type="radio" name="isi_2" value="5" />5</label></td></tr>
+        <tr><td class="num">3</td><td>Do you take anything to help you sleep?</td><td class="c"><label class="opt"><input type="radio" name="isi_3" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="isi_3" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="isi_3" value="3" />3</label></td><td class="c"><label class="opt"><input type="radio" name="isi_3" value="4" />4</label></td><td class="c"><label class="opt"><input type="radio" name="isi_3" value="5" />5</label></td></tr>
+        <tr><td class="num">4</td><td>Do you use alcohol to help you sleep?</td><td class="c"><label class="opt"><input type="radio" name="isi_4" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="isi_4" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="isi_4" value="3" />3</label></td><td class="c"><label class="opt"><input type="radio" name="isi_4" value="4" />4</label></td><td class="c"><label class="opt"><input type="radio" name="isi_4" value="5" />5</label></td></tr>
+        <tr><td class="num">5</td><td>Do you have any medical conditions that disrupt your sleep?</td><td class="c"><label class="opt"><input type="radio" name="isi_5" value="1" />1</label></td><td class="c"><label class="opt"><input type="radio" name="isi_5" value="2" />2</label></td><td class="c"><label class="opt"><input type="radio" name="isi_5" value="3" />3</label></td><td class="c"><label class="opt"><input type="radio" name="isi_5" value="4" />4</label></td><td class="c"><label class="opt"><input type="radio" name="isi_5" value="5" />5</label></td></tr>
+        <tr>
+          <td colspan="2"><span class="blue">Total Score</span></td>
+          <td colspan="5"><span class="score" id="isiScore" data-level="none">0</span><span class="badge" id="isiBand" data-level="none">Not answered</span></td>
+        </tr>
+      </table>
+
+      <div class="section-title" style="margin-top:22px;"><span class="num">5.00</span>Pittsburgh Sleep Quality Index (PSQI)</div>
+      <p class="intro">The Pittsburgh Sleep Quality Index assesses sleep quality and disturbance in adults over a 1-month time interval.</p>
+      <p class="intro"><b>Instructions:</b> The following questions relate to your usual sleep habits during the <b>past month only</b>. Your answers should indicate the most accurate reply for the majority of days and nights in the past month. Please answer all questions.</p>
+
+      <table>
+        <colgroup><col style="width:60%" /><col style="width:40%" /></colgroup>
+        <tr><td>Total time in bed:</td><td><input type="text" name="isi_total_time_in_bed" /></td></tr>
+        <tr><td>Actual sleep time:</td><td><input type="text" name="isi_actual_sleep_time" /></td></tr>
+        <tr><td>Sleep Efficency:</td><td><input type="text" name="isi_sleep_efficiency" /></td></tr>
+      </table>
+
+      <table style="margin-top:22px;">
+        <colgroup>
+          <col style="width:4%" /><col style="width:37%" /><col style="width:14.75%" /><col style="width:14.75%" /><col style="width:14.75%" /><col style="width:14.75%" />
+        </colgroup>
+        <tr><td class="num c"><b>1</b></td><td colspan="3"><b>During the past month, when have you usually gone to bed at night?</b></td><td colspan="2"><input type="time" name="psqi_bedtime" /></td></tr>
+        <tr><td class="num c"><b>2</b></td><td colspan="3"><b>During the past month, how long (in minutes) does it take you to fall asleep each night?</b></td><td colspan="2"><input type="text" name="psqi_sleep_latency" inputmode="numeric" /></td></tr>
+        <tr><td class="num c"><b>3</b></td><td colspan="3"><b>During the past month, when have you usually gotten up in the morning?</b></td><td colspan="2"><input type="time" name="psqi_wakeup_time" /></td></tr>
+        <tr><td class="num c"><b>4</b></td><td colspan="3"><b>During the past month, how many hours of actual sleep did you get at night?</b> (This may be different than the number of hours you spend in bed)</td><td colspan="2"><input type="text" name="psqi_actual_sleep_hours" inputmode="decimal" /></td></tr>
+
+        <tr>
+          <td rowspan="2" class="num c" style="vertical-align:bottom;">5</td>
+          <td rowspan="2" style="vertical-align:bottom;">During the <b>past month</b>, how often have you had trouble sleeping because you:</td>
+          <td class="c" style="font-size:11px;">Not during past month</td><td class="c" style="font-size:11px;">Less than once a week</td><td class="c" style="font-size:11px;">Once or twice a week</td><td class="c" style="font-size:11px;">Three or more times a week</td>
+        </tr>
+        <tr><td class="c"><b>0</b></td><td class="c"><b>1</b></td><td class="c"><b>2</b></td><td class="c"><b>3</b></td></tr>
+
+        <tr><td class="num">a.</td><td>Cannot get to sleep within 30 minutes</td><td class="c"><input type="radio" name="psqi_1" value="0" /></td><td class="c"><input type="radio" name="psqi_1" value="1" /></td><td class="c"><input type="radio" name="psqi_1" value="2" /></td><td class="c"><input type="radio" name="psqi_1" value="3" /></td></tr>
+        <tr><td class="num">b.</td><td>Wake up in the middle of the night or early morning</td><td class="c"><input type="radio" name="psqi_2" value="0" /></td><td class="c"><input type="radio" name="psqi_2" value="1" /></td><td class="c"><input type="radio" name="psqi_2" value="2" /></td><td class="c"><input type="radio" name="psqi_2" value="3" /></td></tr>
+        <tr><td class="num">c.</td><td>Have to get up to use the bathroom</td><td class="c"><input type="radio" name="psqi_3" value="0" /></td><td class="c"><input type="radio" name="psqi_3" value="1" /></td><td class="c"><input type="radio" name="psqi_3" value="2" /></td><td class="c"><input type="radio" name="psqi_3" value="3" /></td></tr>
+        <tr><td class="num">d.</td><td>Cannot breathe comfortably</td><td class="c"><input type="radio" name="psqi_4" value="0" /></td><td class="c"><input type="radio" name="psqi_4" value="1" /></td><td class="c"><input type="radio" name="psqi_4" value="2" /></td><td class="c"><input type="radio" name="psqi_4" value="3" /></td></tr>
+        <tr><td class="num">e.</td><td>Cough or snore loudly</td><td class="c"><input type="radio" name="psqi_5" value="0" /></td><td class="c"><input type="radio" name="psqi_5" value="1" /></td><td class="c"><input type="radio" name="psqi_5" value="2" /></td><td class="c"><input type="radio" name="psqi_5" value="3" /></td></tr>
+        <tr><td class="num">f.</td><td>Feel too cold</td><td class="c"><input type="radio" name="psqi_6" value="0" /></td><td class="c"><input type="radio" name="psqi_6" value="1" /></td><td class="c"><input type="radio" name="psqi_6" value="2" /></td><td class="c"><input type="radio" name="psqi_6" value="3" /></td></tr>
+        <tr><td class="num">g.</td><td>Feel too hot</td><td class="c"><input type="radio" name="psqi_7" value="0" /></td><td class="c"><input type="radio" name="psqi_7" value="1" /></td><td class="c"><input type="radio" name="psqi_7" value="2" /></td><td class="c"><input type="radio" name="psqi_7" value="3" /></td></tr>
+        <tr><td class="num">h.</td><td>Have bad dreams</td><td class="c"><input type="radio" name="psqi_8" value="0" /></td><td class="c"><input type="radio" name="psqi_8" value="1" /></td><td class="c"><input type="radio" name="psqi_8" value="2" /></td><td class="c"><input type="radio" name="psqi_8" value="3" /></td></tr>
+        <tr><td class="num">i.</td><td>Have pain</td><td class="c"><input type="radio" name="psqi_9" value="0" /></td><td class="c"><input type="radio" name="psqi_9" value="1" /></td><td class="c"><input type="radio" name="psqi_9" value="2" /></td><td class="c"><input type="radio" name="psqi_9" value="3" /></td></tr>
+        <tr><td class="num">j.</td><td><div class="fld"><span class="lbl">Other reason(s), please describe:</span><input type="text" name="psqi_other_reason" /></div></td><td class="c"><input type="radio" name="psqi_10" value="0" /></td><td class="c"><input type="radio" name="psqi_10" value="1" /></td><td class="c"><input type="radio" name="psqi_10" value="2" /></td><td class="c"><input type="radio" name="psqi_10" value="3" /></td></tr>
+
+        <tr>
+          <td rowspan="2" class="num c">6</td>
+          <td rowspan="2">During the <b>past month</b>, how often have you taken medicine to help you sleep (prescribed or OTC)?</td>
+          <td class="c" style="font-size:11px;">Not during past month</td><td class="c" style="font-size:11px;">Less than once a week</td><td class="c" style="font-size:11px;">Once or twice a week</td><td class="c" style="font-size:11px;">Three or more times a week</td>
+        </tr>
+        <tr><td class="c"><label class="opt"><input type="radio" name="psqi_med" value="0" /><b>0</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_med" value="1" /><b>1</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_med" value="2" /><b>2</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_med" value="3" /><b>3</b></label></td></tr>
+
+        <tr>
+          <td rowspan="2" class="num c">7</td>
+          <td rowspan="2">During the <b>past month</b>, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?</td>
+          <td class="c" style="font-size:11px;">Not during past month</td><td class="c" style="font-size:11px;">Less than once a week</td><td class="c" style="font-size:11px;">Once or twice a week</td><td class="c" style="font-size:11px;">Three or more times a week</td>
+        </tr>
+        <tr><td class="c"><label class="opt"><input type="radio" name="psqi_awake" value="0" /><b>0</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_awake" value="1" /><b>1</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_awake" value="2" /><b>2</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_awake" value="3" /><b>3</b></label></td></tr>
+
+        <tr>
+          <td rowspan="2" class="num c">8</td>
+          <td rowspan="2">During the <b>past month</b>, how much of a problem has it been for you to be enthusiastic in getting things done?</td>
+          <td class="c" style="font-size:11px;">No problem at all</td><td class="c" style="font-size:11px;">Only a very slight problem</td><td class="c" style="font-size:11px;">Somewhat of a problem</td><td class="c" style="font-size:11px;">A very big problem</td>
+        </tr>
+        <tr><td class="c"><label class="opt"><input type="radio" name="psqi_enthusiasm" value="0" /><b>0</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_enthusiasm" value="1" /><b>1</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_enthusiasm" value="2" /><b>2</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_enthusiasm" value="3" /><b>3</b></label></td></tr>
+
+        <tr>
+          <td rowspan="2" class="num c">9</td>
+          <td rowspan="2">During the <b>past month</b>, how would you rate your sleep quality overall?</td>
+          <td class="c" style="font-size:11px;">Very good</td><td class="c" style="font-size:11px;">Fairly good</td><td class="c" style="font-size:11px;">Fairly bad</td><td class="c" style="font-size:11px;">Very bad</td>
+        </tr>
+        <tr><td class="c"><label class="opt"><input type="radio" name="psqi_quality" value="0" /><b>0</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_quality" value="1" /><b>1</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_quality" value="2" /><b>2</b></label></td><td class="c"><label class="opt"><input type="radio" name="psqi_quality" value="3" /><b>3</b></label></td></tr>
+      </table>
+
+      <!-- ===================== PSQI SCORING ===================== -->
+      <table style="margin-top:-1px;">
+        <tr><td class="redhead" style="padding:12px;">Scoring Criteria</td></tr>
+      </table>
+
+      <table class="comp">
+        <tr><th class="ct">Component 1: &nbsp;Subjective Sleep Quality – Question 9</th></tr>
+      </table>
+      <table class="comp"><colgroup><col style="width:50%" /><col style="width:50%" /></colgroup>
+        <tr>
+          <td><span class="u">Response to Q9</span><div class="li" data-g="c1l" data-i="0">Very good</div><div class="li" data-g="c1l" data-i="1">Fairly good</div><div class="li" data-g="c1l" data-i="2">Fairly bad</div><div class="li" data-g="c1l" data-i="3">Very bad</div></td>
+          <td><span class="u">Component 1 score</span><div class="li" data-g="c1r" data-i="0">0</div><div class="li" data-g="c1r" data-i="1">1</div><div class="li" data-g="c1r" data-i="2">2</div><div class="li" data-g="c1r" data-i="3">3</div><div class="cscore"><span class="blue">Component 1 score:</span> <span class="score" id="psqiC1" data-level="none">–</span></div></td>
+        </tr>
+      </table>
+      <table class="comp">
+        <tr><th class="ct">Component 2: &nbsp;Sleep Latency – Question 2 and 5a</th></tr>
+      </table>
+      <table class="comp"><colgroup><col style="width:50%" /><col style="width:50%" /></colgroup>
+        <tr>
+          <td><span class="u">Response to Q2</span><div class="li" data-g="c2q2l" data-i="0">less than or equal to 15 minutes</div><div class="li" data-g="c2q2l" data-i="1">16 – 30 minutes</div><div class="li" data-g="c2q2l" data-i="2">31 – 60 minutes</div><div class="li" data-g="c2q2l" data-i="3">More than 60 minutes</div><span class="u">Response to Q5a</span><div class="li" data-g="c2q5l" data-i="0">Not during past month</div><div class="li" data-g="c2q5l" data-i="1">Less than once a week</div><div class="li" data-g="c2q5l" data-i="2">Once or twice a week</div><div class="li" data-g="c2q5l" data-i="3">Three or more times a week</div><span class="u">Sum of Q2 and Q5a sub scores <span class="subsum" id="psqiSum2"></span></span><div class="li" data-g="c2sl" data-i="0">0</div><div class="li" data-g="c2sl" data-i="1">1 – 2</div><div class="li" data-g="c2sl" data-i="2">3 – 4</div><div class="li" data-g="c2sl" data-i="3">5 – 6</div></td>
+          <td><span class="u">Component 2/Q2 sub score</span><div class="li" data-g="c2q2r" data-i="0">0</div><div class="li" data-g="c2q2r" data-i="1">1</div><div class="li" data-g="c2q2r" data-i="2">2</div><div class="li" data-g="c2q2r" data-i="3">3</div><span class="u">Component 2/Q5a sub score</span><div class="li" data-g="c2q5r" data-i="0">0</div><div class="li" data-g="c2q5r" data-i="1">1</div><div class="li" data-g="c2q5r" data-i="2">2</div><div class="li" data-g="c2q5r" data-i="3">3</div><span class="u">Component 2 score</span><div class="li" data-g="c2r" data-i="0">0</div><div class="li" data-g="c2r" data-i="1">1</div><div class="li" data-g="c2r" data-i="2">2</div><div class="li" data-g="c2r" data-i="3">3</div><div class="cscore"><span class="blue">Component 2 score:</span> <span class="score" id="psqiC2" data-level="none">–</span></div></td>
+        </tr>
+      </table>
+      <table class="comp">
+        <tr><th class="ct">Component 3: Sleep Duration – Question 4</th></tr>
+      </table>
+      <table class="comp"><colgroup><col style="width:50%" /><col style="width:50%" /></colgroup>
+        <tr>
+          <td><span class="u">Response to Q4</span><div class="li" data-g="c3l" data-i="0">more than 7 hours</div><div class="li" data-g="c3l" data-i="1">6 – 7 hours</div><div class="li" data-g="c3l" data-i="2">5 – 6 hours</div><div class="li" data-g="c3l" data-i="3">less than 5 hours</div></td>
+          <td><span class="u">Component 3 score</span><div class="li" data-g="c3r" data-i="0">0</div><div class="li" data-g="c3r" data-i="1">1</div><div class="li" data-g="c3r" data-i="2">2</div><div class="li" data-g="c3r" data-i="3">3</div><div class="cscore"><span class="blue">Component 3 score:</span> <span class="score" id="psqiC3" data-level="none">–</span></div></td>
+        </tr>
+      </table>
+      <table class="comp">
+        <tr><th class="ct">Component 4: Sleep Efficiency – Questions 1, 3, and 4
+          <div class="formula">Sleep efficiency = (# hours slept / # hours in bed) X 100% (# hours slept – Question 4; # hours in bed – questions 1 and 3)</div></th></tr>
+      </table>
+      <table class="comp"><colgroup><col style="width:50%" /><col style="width:50%" /></colgroup>
+        <tr>
+          <td><span class="u">Sleep Efficiency</span><div class="li" data-g="c4l" data-i="0">greater than 85%</div><div class="li" data-g="c4l" data-i="1">75 – 84%</div><div class="li" data-g="c4l" data-i="2">65 – 74%</div><div class="li" data-g="c4l" data-i="3">less than 65%</div></td>
+          <td><span class="u">Component 4 score</span><div class="li" data-g="c4r" data-i="0">0</div><div class="li" data-g="c4r" data-i="1">1</div><div class="li" data-g="c4r" data-i="2">2</div><div class="li" data-g="c4r" data-i="3">3</div><div class="cscore"><span class="eff-out" id="psqiEff"></span><span class="blue">Component 4 score:</span> <span class="score" id="psqiC4" data-level="none">–</span></div></td>
+        </tr>
+      </table>
+      <table class="comp">
+        <tr><th class="ct">Component 5: Sleep Disturbance – Questions 5b – 5j</th></tr>
+      </table>
+      <table class="comp"><colgroup><col style="width:50%" /><col style="width:50%" /></colgroup>
+        <tr>
+          <td style="padding-top:22px;"><div class="li">Not during past month</div><div class="li">Less than once a week</div><div class="li">Once or twice a week</div><div class="li">Three or more times a week</div><span class="u">Sum of 5b to 5j scores <span class="subsum" id="psqiSum5"></span></span><div class="li" data-g="c5sl" data-i="0">0</div><div class="li" data-g="c5sl" data-i="1">1 – 9</div><div class="li" data-g="c5sl" data-i="2">10 – 18</div><div class="li" data-g="c5sl" data-i="3">19 – 27</div></td>
+          <td><span class="u">Questions 5b to 5j should be scored as follows:</span><div class="li">0</div><div class="li">1</div><div class="li">2</div><div class="li">3</div><span class="u">Component 5 score</span><div class="li" data-g="c5r" data-i="0">0</div><div class="li" data-g="c5r" data-i="1">1</div><div class="li" data-g="c5r" data-i="2">2</div><div class="li" data-g="c5r" data-i="3">3</div><div class="cscore"><span class="blue">Component 5 score:</span> <span class="score" id="psqiC5" data-level="none">–</span></div></td>
+        </tr>
+      </table>
+      <table class="comp">
+        <tr><th class="ct">Component 6: Use of Sleep Medication – Questions 6</th></tr>
+      </table>
+      <table class="comp"><colgroup><col style="width:50%" /><col style="width:50%" /></colgroup>
+        <tr>
+          <td><span class="u">Response to Q6</span><div class="li" data-g="c6l" data-i="0">Not during past month</div><div class="li" data-g="c6l" data-i="1">Less than once a week</div><div class="li" data-g="c6l" data-i="2">Once or twice a week</div><div class="li" data-g="c6l" data-i="3">Three or more times a week</div></td>
+          <td><span class="u">Component 6 score</span><div class="li" data-g="c6r" data-i="0">0</div><div class="li" data-g="c6r" data-i="1">1</div><div class="li" data-g="c6r" data-i="2">2</div><div class="li" data-g="c6r" data-i="3">3</div><div class="cscore"><span class="blue">Component 6 score:</span> <span class="score" id="psqiC6" data-level="none">–</span></div></td>
+        </tr>
+      </table>
+      <table class="comp">
+        <tr><th class="ct">Component 7: Daytime Dysfunction – Questions 7 and 8</th></tr>
+      </table>
+      <table class="comp"><colgroup><col style="width:50%" /><col style="width:50%" /></colgroup>
+        <tr>
+          <td><span class="u">Response to Q7</span><div class="li" data-g="c7q7l" data-i="0">Not during past month</div><div class="li" data-g="c7q7l" data-i="1">Less than once a week</div><div class="li" data-g="c7q7l" data-i="2">Once or twice a week</div><div class="li" data-g="c7q7l" data-i="3">Three or more times a week</div><span class="u">Response to Q8</span><div class="li" data-g="c7q8l" data-i="0">No problem at all</div><div class="li" data-g="c7q8l" data-i="1">Only a very slight problem</div><div class="li" data-g="c7q8l" data-i="2">Somewhat of a problem</div><div class="li" data-g="c7q8l" data-i="3">A very big problem</div><span class="u">Sum of Q7 and Q8 sub scores <span class="subsum" id="psqiSum7"></span></span><div class="li" data-g="c7sl" data-i="0">0</div><div class="li" data-g="c7sl" data-i="1">1 – 2</div><div class="li" data-g="c7sl" data-i="2">3 – 4</div><div class="li" data-g="c7sl" data-i="3">5 – 6</div></td>
+          <td><span class="u">Component 7 / Q7 sub score</span><div class="li" data-g="c7q7r" data-i="0">0</div><div class="li" data-g="c7q7r" data-i="1">1</div><div class="li" data-g="c7q7r" data-i="2">2</div><div class="li" data-g="c7q7r" data-i="3">3</div><span class="u">Component 8 / Q8 sub score</span><div class="li" data-g="c7q8r" data-i="0">0</div><div class="li" data-g="c7q8r" data-i="1">1</div><div class="li" data-g="c7q8r" data-i="2">2</div><div class="li" data-g="c7q8r" data-i="3">3</div><span class="u">Component 7 score</span><div class="li" data-g="c7r" data-i="0">0</div><div class="li" data-g="c7r" data-i="1">1</div><div class="li" data-g="c7r" data-i="2">2</div><div class="li" data-g="c7r" data-i="3">3</div><div class="cscore"><span class="blue">Component 7 score:</span> <span class="score" id="psqiC7" data-level="none">–</span></div></td>
+        </tr>
+      </table>
+
+      <table class="comp global-row">
+        <tr><td><span class="blue">Global PSQI Score</span> <b>(Sum of seven component scores):</b> &nbsp;<span class="score" id="psqiGlobal" data-level="none">–</span><span class="badge" id="psqiBand" data-level="none">Incomplete</span></td></tr>
+      </table>
+
+      <div class="toolbar">
+        <button type="button" id="backupBtn" class="secondary">Save Backup (JSON)</button>
+        <button type="button" id="restoreBtn" class="secondary">Load Backup</button>
+        <input type="file" id="restoreFile" accept=".json,application/json" style="display:none" />
+        <button type="button" id="saveBtn" class="secondary">Submit to Service</button>
+        <button type="button" id="csvBtn">Export CSV</button>
+        <button type="button" id="excelBtn">Export Excel</button>
+        <button type="button" id="pdfBtn" class="accent">Export PDF</button>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+      const form = document.querySelector('.page');
+
+      const LOGO_SRC = 'data:image/png;base64,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';
+      document.querySelectorAll('img.logo').forEach((img) => { img.src = LOGO_SRC; });
+
+      function getFormData() {
+        const data = {};
+        const inputs = document.querySelectorAll('input, textarea');
+
+        inputs.forEach((el) => {
+          if (el.type === 'checkbox') {
+            if (!data[el.name]) data[el.name] = [];
+            if (el.checked) data[el.name].push(el.value || 'Checked');
+            return;
+          }
+
+          if (el.type === 'radio') {
+            if (el.checked) {
+              data[el.name] = el.value;
+            }
+            return;
+          }
+
+          if (el.name) {
+            data[el.name] = el.value;
+          }
+        });
+
+        return data;
+      }
+
+      function calculateRadioTotal(namePrefix, values) {
+        let total = 0;
+        values.forEach((index) => {
+          const el = document.querySelector(`input[name="${namePrefix}_${index}"]:checked`);
+          if (el) total += Number(el.value || 0);
+        });
+        return total;
+      }
+
+      /* ---------- score colour scheme helpers ---------- */
+      function setLevel(id, level, text) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.setAttribute('data-level', level);
+        if (text !== undefined) el.textContent = text;
+      }
+
+      function countChecked(prefix, count) {
+        let n = 0;
+        for (let i = 1; i <= count; i++) {
+          if (document.querySelector(`input[name="${prefix}_${i}"]:checked`)) n++;
+        }
+        return n;
+      }
+
+      function highlightLegend(selector, total, answered) {
+        document.querySelectorAll(selector).forEach((row) => {
+          const min = Number(row.dataset.min);
+          const max = Number(row.dataset.max);
+          row.classList.toggle('active', answered > 0 && total >= min && total <= max);
+        });
+      }
+
+      function essBand(t) {
+        if (t <= 5) return ['ok', 'Lower normal daytime sleepiness'];
+        if (t <= 10) return ['ok2', 'Higher normal daytime sleepiness'];
+        if (t <= 12) return ['warn', 'Mild excessive daytime sleepiness'];
+        if (t <= 15) return ['high', 'Moderate excessive daytime sleepiness'];
+        return ['severe', 'Severe excessive daytime sleepiness'];
+      }
+
+      function stopBand(t) {
+        if (t <= 2) return ['ok', 'Low risk of OSA'];
+        if (t <= 4) return ['warn', 'Intermediate risk of OSA'];
+        return ['severe', 'High risk of OSA'];
+      }
+
+      // The form does not publish ISI bands, so these are indicative bands across the 5–25 range.
+      function isiBand(t) {
+        if (t <= 10) return ['ok', 'Low'];
+        if (t <= 15) return ['warn', 'Mild'];
+        if (t <= 20) return ['high', 'Moderate'];
+        return ['severe', 'Severe'];
+      }
+
+      /* ---------- PSQI scoring ---------- */
+      function radioVal(name) {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? Number(el.value) : null;
+      }
+
+      function textNum(name) {
+        const el = document.querySelector(`input[name="${name}"]`);
+        if (!el || el.value.trim() === '') return null;
+        const n = parseFloat(el.value);
+        return isNaN(n) ? null : n;
+      }
+
+      function timeMins(name) {
+        const el = document.querySelector(`input[name="${name}"]`);
+        if (!el || !el.value) return null;
+        const parts = el.value.split(':');
+        return Number(parts[0]) * 60 + Number(parts[1]);
+      }
+
+      function compLevel(score) {
+        return ['ok', 'warn', 'high', 'severe'][score];
+      }
+
+      function setComp(n, score) {
+        if (score === null) {
+          setLevel('psqiC' + n, 'none', '–');
+        } else {
+          setLevel('psqiC' + n, compLevel(score), String(score));
+        }
+      }
+
+      function sumBand(sum, cuts) {
+        // cuts: upper bounds for scores 0, 1, 2 ; anything above is 3
+        if (sum <= cuts[0]) return 0;
+        if (sum <= cuts[1]) return 1;
+        if (sum <= cuts[2]) return 2;
+        return 3;
+      }
+
+      function updatePSQI() {
+        // C1
+        const q9 = radioVal('psqi_quality');
+        const c1 = q9;
+        const marks = {};
+        marks.c1l = q9; marks.c1r = q9;
+
+        // C2
+        const q2 = textNum('psqi_sleep_latency');
+        const q5a = radioVal('psqi_1');
+        let c2 = null;
+        const sub2 = q2 === null ? null : (q2 <= 15 ? 0 : q2 <= 30 ? 1 : q2 <= 60 ? 2 : 3);
+        marks.c2q2l = sub2; marks.c2q2r = sub2;
+        marks.c2q5l = q5a; marks.c2q5r = q5a;
+        if (sub2 !== null && q5a !== null) {
+          c2 = sumBand(sub2 + q5a, [0, 2, 4]);
+          marks.c2sl = c2; marks.c2r = c2;
+        }
+
+        // C3
+        const q4 = textNum('psqi_actual_sleep_hours');
+        let c3 = null;
+        if (q4 !== null) c3 = q4 > 7 ? 0 : q4 >= 6 ? 1 : q4 >= 5 ? 2 : 3;
+        marks.c3l = c3; marks.c3r = c3;
+
+        // C4
+        const bed = timeMins('psqi_bedtime');
+        const wake = timeMins('psqi_wakeup_time');
+        let c4 = null;
+        const effEl = document.getElementById('psqiEff');
+        effEl.textContent = '';
+        if (bed !== null && wake !== null && q4 !== null) {
+          let diff = (wake - bed + 1440) % 1440;
+          if (diff > 0) {
+            const eff = (q4 / (diff / 60)) * 100;
+            effEl.textContent = 'Sleep efficiency: ' + eff.toFixed(0) + '%';
+            c4 = eff > 85 ? 0 : eff >= 75 ? 1 : eff >= 65 ? 2 : 3;
+          }
+        }
+        marks.c4l = c4; marks.c4r = c4;
+
+        // C5 (5b – 5j)
+        let c5 = null;
+        let sum5 = 0;
+        let all5 = true;
+        let answered5 = 0;
+        ['2','3','4','5','6','7','8','9','10'].forEach((i) => {
+          const v = radioVal('psqi_' + i);
+          if (v === null) all5 = false; else { sum5 += v; answered5++; }
+        });
+        if (all5) c5 = sumBand(sum5, [0, 9, 18]);
+        marks.c5sl = c5; marks.c5r = c5;
+
+        // C6
+        const c6 = radioVal('psqi_med');
+        marks.c6l = c6; marks.c6r = c6;
+
+        // C7
+        const q7 = radioVal('psqi_awake');
+        const q8 = radioVal('psqi_enthusiasm');
+        let c7 = null;
+        if (q7 !== null && q8 !== null) c7 = sumBand(q7 + q8, [0, 2, 4]);
+        // sub totals shown next to each "Sum of ..." heading
+        document.getElementById('psqiSum2').textContent =
+          (sub2 !== null && q5a !== null) ? '= ' + (sub2 + q5a) : '';
+        document.getElementById('psqiSum5').textContent =
+          all5 ? '= ' + sum5 : (answered5 ? '(so far ' + sum5 + ')' : '');
+        document.getElementById('psqiSum7').textContent =
+          (q7 !== null && q8 !== null) ? '= ' + (q7 + q8) : '';
+        marks.c7q7l = q7; marks.c7q7r = q7;
+        marks.c7q8l = q8; marks.c7q8r = q8;
+        marks.c7sl = c7; marks.c7r = c7;
+
+        [c1, c2, c3, c4, c5, c6, c7].forEach((c, i) => setComp(i + 1, c));
+
+        // highlight the matching rows in the scoring criteria tables
+        document.querySelectorAll('.li[data-g]').forEach((el) => {
+          const v = marks[el.dataset.g];
+          const idx = Number(el.dataset.i);
+          const on = v !== null && v !== undefined && idx === v;
+          el.classList.toggle('on', on);
+          if (on) el.setAttribute('data-level', compLevel(idx));
+          else el.removeAttribute('data-level');
+        });
+
+        const comps = [c1, c2, c3, c4, c5, c6, c7];
+        if (comps.every((c) => c !== null)) {
+          const g = comps.reduce((a, b) => a + b, 0);
+          const lvl = g <= 5 ? 'ok' : g <= 10 ? 'warn' : g <= 15 ? 'high' : 'severe';
+          setLevel('psqiGlobal', lvl, String(g));
+          setLevel('psqiBand', lvl, g <= 5 ? 'Good sleep quality' : 'Poor sleep quality');
+        } else {
+          // running subtotal of the components completed so far
+          const done = comps.filter((c) => c !== null);
+          const running = done.reduce((a, b) => a + b, 0);
+          setLevel('psqiGlobal', 'none', done.length ? String(running) : '–');
+          setLevel('psqiBand', 'none', done.length
+            ? 'Subtotal – ' + done.length + ' of 7 components'
+            : 'Incomplete');
+        }
+      }
+
+      function updateScores() {
+        const essTotal = calculateRadioTotal('ess', [1,2,3,4,5,6,7,8]);
+        const stopTotal = ['1','2','3','4','5','6','7','8'].filter((index) => {
+          const el = document.querySelector(`input[name="stop_${index}"]:checked`);
+          return el && el.value === 'Yes';
+        }).length;
+        const isiTotal = ['1','2','3','4','5'].reduce((sum, idx) => {
+          const el = document.querySelector(`input[name="isi_${idx}"]:checked`);
+          return sum + (el ? Number(el.value || 0) : 0);
+        }, 0);
+
+        document.getElementById('essScore').textContent = essTotal;
+        document.getElementById('stopBangScore').textContent = stopTotal;
+        document.getElementById('isiScore').textContent = isiTotal;
+
+        // colour schemes
+        const essAnswered = countChecked('ess', 8);
+        const stopAnswered = countChecked('stop', 8);
+        const isiAnswered = countChecked('isi', 5);
+
+        const eb = essBand(essTotal);
+        setLevel('essScore', essAnswered ? eb[0] : 'none');
+        setLevel('essBand', essAnswered ? eb[0] : 'none', essAnswered ? eb[1] : 'Not answered');
+        highlightLegend('#essLegend .row, #essLegend2 .row', essTotal, essAnswered);
+
+        const sb = stopBand(stopTotal);
+        setLevel('stopBangScore', stopAnswered ? sb[0] : 'none');
+        setLevel('stopBand', stopAnswered ? sb[0] : 'none', stopAnswered ? sb[1] : 'Not answered');
+        document.querySelectorAll('.stop-legend').forEach((row) => {
+          const on = stopAnswered > 0 && stopTotal >= Number(row.dataset.min) && stopTotal <= Number(row.dataset.max);
+          row.style.background = on ? ({ ok: '#dff3e2', warn: '#fff1c2', severe: '#fddada' })[row.dataset.lv] : '';
+          row.style.fontWeight = on ? '700' : '';
+        });
+
+        const ib = isiBand(isiTotal);
+        setLevel('isiScore', isiAnswered ? ib[0] : 'none');
+        setLevel('isiBand', isiAnswered ? ib[0] : 'none', isiAnswered ? ib[1] : 'Not answered');
+
+        updatePSQI();
+      }
+
+      document.addEventListener('change', function (event) {
+        if (event.target && event.target.type === 'radio' || event.target.type === 'checkbox') {
+          updateScores();
+        }
+      });
+
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.type !== 'radio' && event.target.type !== 'checkbox') {
+          updatePSQI();
+        }
+      });
+
+      /* ================= EXPORT ================= */
+
+      function textOf(el) {
+        return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+      }
+
+      // text of a given cell in the table row that holds this input
+      function rowCell(name, idx) {
+        const input = document.querySelector(`input[name="${name}"]`);
+        const row = input ? input.closest('tr') : null;
+        return row ? textOf(row.children[idx]) : name;
+      }
+
+      const ESS_LABELS = ['Never', 'Slight', 'Moderate', 'High'];
+      const ISI_LABELS = ['Never', 'Rarely', 'Occasionally', 'Most Nights/Days', 'Always'];
+      const PSQI_FREQ = ['Not during past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week'];
+      const PSQI_PROBLEM = ['No problem at all', 'Only a very slight problem', 'Somewhat of a problem', 'A very big problem'];
+      const PSQI_QUALITY = ['Very good', 'Fairly good', 'Fairly bad', 'Very bad'];
+
+      function labelled(value, labels, offset) {
+        if (value === undefined || value === '') return '';
+        const n = Number(value);
+        return (labels[n - offset] || '') + ' (' + n + ')';
+      }
+
+      function stamp() {
+        const d = new Date();
+        const p = (n) => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+      }
+
+      function fileBase() {
+        const nameEl = document.querySelector('input[name="name"]');
+        const who = nameEl && nameEl.value.trim()
+          ? '-' + nameEl.value.trim().replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '')
+          : '';
+        return 'sleep-questionnaire' + who + '-' + stamp();
+      }
+
+      // Assessment, score, maximum, result – read from what is on screen
+      function scoreSummary() {
+        const num = (id) => {
+          const t = document.getElementById(id).textContent.trim();
+          return t === '–' || t === '' ? '' : Number(t);
+        };
+        const txt = (id) => document.getElementById(id).textContent.trim();
+        const names = [
+          'Component 1 – Subjective Sleep Quality', 'Component 2 – Sleep Latency', 'Component 3 – Sleep Duration',
+          'Component 4 – Sleep Efficiency', 'Component 5 – Sleep Disturbance', 'Component 6 – Use of Sleep Medication',
+          'Component 7 – Daytime Dysfunction'
+        ];
+        const out = [
+          ['Epworth Sleepiness Scale (ESS) – total', num('essScore'), 24, txt('essBand')],
+          ['STOP-BANG – total', num('stopBangScore'), 8, txt('stopBand')],
+          ['Insomnia Severity Index (ISI) – total', num('isiScore'), 25, txt('isiBand')]
+        ];
+        names.forEach((n, i) => out.push(['PSQI ' + n, num('psqiC' + (i + 1)), 3, '']));
+        out.push(['PSQI – Global score', num('psqiGlobal'), 21, txt('psqiBand')]);
+        return out;
+      }
+
+      // Every answer, in form order, with readable labels: [section, field, response]
+      function buildExportRows() {
+        const d = getFormData();
+        const rows = [];
+        const add = (section, field, value) =>
+          rows.push([section, field, value === undefined || value === null ? '' : String(value)]);
+        const val = (k) => {
+          const v = d[k];
+          return Array.isArray(v) ? v.join('; ') : (v || '');
+        };
+
+        const S1 = '1.00 Driver/Operator Information';
+        [
+          ['date', 'Date'], ['time', 'Time'], ['not_applicable', 'Not applicable'],
+          ['purpose', 'Purpose of Health Assessment'], ['occupational_health_clinic', 'Occupational Health Clinic'],
+          ['driver_license_no', 'CMV Driver License No.'], ['license_class', 'License Class'],
+          ['cmv_category', 'CMV Category'], ['permit_type', 'Permit Type'], ['driving_route', 'Driving route'],
+          ['name', 'Name'], ['age_sex', 'Age/Sex'], ['work_id', 'Work ID No.'], ['job_title', 'Job Title'],
+          ['department', 'Department'], ['work_site', 'Work Site'], ['dob', 'DOB'], ['email', 'Email'],
+          ['work_phone', 'Work Phone']
+        ].forEach(([k, label]) => {
+          add(S1, label, k === 'not_applicable' ? (d[k] && d[k].length ? 'Yes' : 'No') : val(k));
+        });
+
+        const S11 = '1.10 Employer Information';
+        [
+          ['employer', 'Employer'], ['address', 'Address'], ['contact_name', 'Contact name'],
+          ['contact_phone', 'Phone'], ['contact_email', 'Contact email address']
+        ].forEach(([k, label]) => add(S11, label, val(k)));
+
+        const S2 = '2.00 Epworth Sleepiness Scale (ESS)';
+        for (let i = 1; i <= 8; i++) {
+          add(S2, i + '. ' + rowCell('ess_' + i, 1), labelled(d['ess_' + i], ESS_LABELS, 0));
+        }
+        add(S2, 'Total Epworth Score', textOf(document.getElementById('essScore')));
+        add(S2, 'Result', textOf(document.getElementById('essBand')));
+
+        const S3 = '3.00 STOP-BANG Sleep Apnoea Questionnaire';
+        for (let i = 1; i <= 8; i++) {
+          add(S3, rowCell('stop_' + i, 0), d['stop_' + i] || '');
+        }
+        add(S3, 'Total Score', textOf(document.getElementById('stopBangScore')));
+        add(S3, 'Result', textOf(document.getElementById('stopBand')));
+
+        const S4 = '4.00 Insomnia Severity Index (ISI)';
+        for (let i = 1; i <= 5; i++) {
+          add(S4, i + '. ' + rowCell('isi_' + i, 1), labelled(d['isi_' + i], ISI_LABELS, 1));
+        }
+        add(S4, 'Total Score', textOf(document.getElementById('isiScore')));
+        add(S4, 'Result', textOf(document.getElementById('isiBand')));
+
+        const S5 = '5.00 Pittsburgh Sleep Quality Index (PSQI)';
+        add(S5, 'Total time in bed', val('isi_total_time_in_bed'));
+        add(S5, 'Actual sleep time', val('isi_actual_sleep_time'));
+        add(S5, 'Sleep Efficiency', val('isi_sleep_efficiency'));
+        add(S5, '1. Usual bedtime (past month)', val('psqi_bedtime'));
+        add(S5, '2. Minutes to fall asleep', val('psqi_sleep_latency'));
+        add(S5, '3. Usual wake-up time (past month)', val('psqi_wakeup_time'));
+        add(S5, '4. Hours of actual sleep per night', val('psqi_actual_sleep_hours'));
+        const q5 = 'abcdefghij';
+        for (let i = 1; i <= 10; i++) {
+          let q = '5' + q5[i - 1] + '. ' + rowCell('psqi_' + i, 1).replace(/\s*Other reason\(s\), please describe:\s*/, 'Other reason(s)');
+          if (i === 10 && val('psqi_other_reason')) q += ' – ' + val('psqi_other_reason');
+          add(S5, q, labelled(d['psqi_' + i], PSQI_FREQ, 0));
+        }
+        add(S5, '6. Medicine to help you sleep', labelled(d.psqi_med, PSQI_FREQ, 0));
+        add(S5, '7. Trouble staying awake while driving, eating meals or in social activity', labelled(d.psqi_awake, PSQI_FREQ, 0));
+        add(S5, '8. Problem being enthusiastic in getting things done', labelled(d.psqi_enthusiasm, PSQI_PROBLEM, 0));
+        add(S5, '9. Overall sleep quality', labelled(d.psqi_quality, PSQI_QUALITY, 0));
+
+        const S6 = 'PSQI Scoring Criteria';
+        scoreSummary().slice(3).forEach(([n, score, max, res]) => {
+          add(S6, n, score === '' ? '' : score);
+        });
+        add(S6, 'Sleep efficiency (calculated)', textOf(document.getElementById('psqiEff')).replace('Sleep efficiency: ', ''));
+        add(S6, 'Result', textOf(document.getElementById('psqiBand')));
+
+        return rows;
+      }
+
+      function flattenData(data) {
+        const rows = [];
+        Object.entries(data).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            rows.push([key, value.join('; ')]);
+          } else {
+            rows.push([key, value || '']);
+          }
+        });
+        return rows;
+      }
+
+      function downloadFile(filename, content, type) {
+        const blob = new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function csvCell(cell) {
+        return '"' + String(cell === undefined || cell === null ? '' : cell).replace(/"/g, '""') + '"';
+      }
+
+      function exportCSV() {
+        const lines = [['Section', 'Field', 'Response']].concat(buildExportRows());
+        const summary = [['Scores', 'Assessment', 'Score / Result']];
+        scoreSummary().forEach(([n, score, max, res]) => {
+          summary.push(['Scores', n + (max ? ' (out of ' + max + ')' : ''), (score === '' ? '' : score) + (res ? ' – ' + res : '')]);
+        });
+        const csv = lines.concat(summary).map((row) => row.map(csvCell).join(',')).join('\r\n');
+        // BOM so Excel reads UTF-8 (en dashes etc.) correctly
+        downloadFile(fileBase() + '.csv', '﻿' + csv, 'text/csv;charset=utf-8;');
+      }
+
+      function exportExcel() {
+        if (!window.XLSX) {
+          alert('Excel library failed to load. Please refresh the page and try again.');
+          return;
+        }
+        const workbook = XLSX.utils.book_new();
+
+        const rows = buildExportRows();
+        const sheet1 = XLSX.utils.aoa_to_sheet([
+          ['Sleep Quality Assessment – Sleep Disorders Questionnaire'],
+          ['Exported: ' + stamp()],
+          [],
+          ['Section', 'Field', 'Response']
+        ].concat(rows));
+        sheet1['!cols'] = [{ wch: 42 }, { wch: 70 }, { wch: 42 }];
+        sheet1['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
+        XLSX.utils.book_append_sheet(workbook, sheet1, 'Sleep Assessment');
+
+        const sheet2 = XLSX.utils.aoa_to_sheet([['Assessment', 'Score', 'Out of', 'Result']].concat(scoreSummary()));
+        sheet2['!cols'] = [{ wch: 48 }, { wch: 10 }, { wch: 10 }, { wch: 40 }];
+        XLSX.utils.book_append_sheet(workbook, sheet2, 'Scores');
+
+        const sheet3 = XLSX.utils.aoa_to_sheet([['Field', 'Value']].concat(flattenData(getFormData())));
+        sheet3['!cols'] = [{ wch: 32 }, { wch: 40 }];
+        XLSX.utils.book_append_sheet(workbook, sheet3, 'Raw Data');
+
+        XLSX.writeFile(workbook, fileBase() + '.xlsx');
+      }
+
+      /* ================= LOCAL JSON BACKUP ================= */
+
+      function saveBackup() {
+        const backup = {
+          app: 'sleep-disorders-questionnaire',
+          version: 1,
+          savedAt: new Date().toISOString(),
+          form: getFormData(),
+          scores: scoreSummary().map(([assessment, score, outOf, result]) => ({ assessment, score, outOf, result }))
+        };
+        downloadFile(fileBase() + '-backup.json', JSON.stringify(backup, null, 2), 'application/json;charset=utf-8;');
+      }
+
+      function setFormData(data) {
+        document.querySelectorAll('.page input').forEach((el) => {
+          if (!el.name || el.type === 'file') return;
+          const v = data[el.name];
+          if (el.type === 'checkbox') {
+            el.checked = Array.isArray(v) && v.includes(el.value);
+          } else if (el.type === 'radio') {
+            el.checked = v !== undefined && String(v) === el.value;
+          } else {
+            el.value = v === undefined || v === null || Array.isArray(v) ? '' : String(v);
+          }
+        });
+        updateScores();
+      }
+
+      function restoreBackup(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            const data = parsed && typeof parsed.form === 'object' && parsed.form ? parsed.form : parsed;
+            if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Not a questionnaire backup');
+            if (!('ess_1' in data || 'name' in data || 'psqi_1' in data)) throw new Error('Not a questionnaire backup');
+            setFormData(data);
+            alert('Backup loaded.');
+          } catch (error) {
+            console.error(error);
+            alert('That file could not be read as a questionnaire backup (.json).');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      // Items that must stay together with whatever follows them
+      function keepsWithNext(el) {
+        return el.classList.contains('section-title') || el.classList.contains('intro') ||
+          el.classList.contains('note-line') || el.classList.contains('sheet-title') ||
+          el.classList.contains('sheet-head') || el.classList.contains('band') ||
+          (el.matches('table.comp') && !!el.querySelector('th.ct')) ||
+          !!el.querySelector('.redhead');
+      }
+
+      async function exportPDF() {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          alert('PDF library failed to load. Please refresh the page and try again.');
+          return;
+        }
+        if (typeof html2canvas !== 'function') {
+          alert('The page-capture library failed to load, so the print dialog will open instead. Choose "Save as PDF" there.');
+          window.print();
+          return;
+        }
+
+        const btn = document.getElementById('pdfBtn');
+        const btnLabel = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Preparing PDF…';
+
+        const page = document.querySelector('.page');
+        const toolbar = page.querySelector('.toolbar');
+        const saved = { width: page.style.width, maxWidth: page.style.maxWidth, shadow: page.style.boxShadow, display: toolbar.style.display };
+
+        try {
+          toolbar.style.display = 'none';
+          page.style.width = '860px';
+          page.style.maxWidth = '860px';
+          page.style.boxShadow = 'none';
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+          const pageRect = page.getBoundingClientRect();
+          const scale = 2;
+          const canvas = await html2canvas(page, {
+            scale: scale,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            windowWidth: 1000
+          });
+          const pxRatio = canvas.width / pageRect.width;
+
+          // work out where each PDF page starts and ends (CSS px from top of the form)
+          const blocks = [];
+          let forceBreak = false;
+          let prevKeeps = false;
+          Array.from(page.children).forEach((el) => {
+            if (el === toolbar) return;
+            const r = el.getBoundingClientRect();
+            if (el.classList.contains('page-break') && r.height === 0) { forceBreak = true; return; }
+            const item = { top: r.top - pageRect.top, bottom: r.bottom - pageRect.top };
+            if (prevKeeps && blocks.length) {
+              blocks[blocks.length - 1].bottom = item.bottom;
+            } else {
+              item.brk = forceBreak || el.classList.contains('page-break');
+              blocks.push(item);
+            }
+            forceBreak = false;
+            prevKeeps = keepsWithNext(el);
+          });
+
+          const A4W = 595.28, A4H = 841.89, MARGIN = 28;
+          const contentW = A4W - MARGIN * 2;
+          const factor = contentW / pageRect.width;            // pt per CSS px
+          const maxH = (A4H - MARGIN * 2 - 12) / factor;       // CSS px that fit on one page
+
+          const pages = [];
+          let cur = null;
+          blocks.forEach((b) => {
+            if (cur && !b.brk && (b.bottom - cur.top) <= maxH) {
+              cur.bottom = b.bottom;
+            } else {
+              cur = { top: b.top, bottom: b.bottom };
+              pages.push(cur);
+            }
+          });
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+          doc.setProperties({ title: 'Sleep Disorders Questionnaire' });
+
+          pages.forEach((p, idx) => {
+            if (idx > 0) doc.addPage();
+            const sy = Math.max(0, Math.round(p.top * pxRatio));
+            const sh = Math.min(canvas.height - sy, Math.round((p.bottom - p.top) * pxRatio));
+            const slice = document.createElement('canvas');
+            slice.width = canvas.width;
+            slice.height = sh;
+            const ctx = slice.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, slice.width, slice.height);
+            ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+
+            let w = contentW;
+            let h = (p.bottom - p.top) * factor;
+            const availH = A4H - MARGIN * 2 - 12;
+            if (h > availH) { w = w * (availH / h); h = availH; }
+            const x = MARGIN + (contentW - w) / 2;
+            doc.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', x, MARGIN, w, h);
+
+            doc.setFontSize(8);
+            doc.setTextColor(110);
+            doc.text('Page ' + (idx + 1) + ' of ' + pages.length, A4W / 2, A4H - 14, { align: 'center' });
+          });
+
+          doc.save(fileBase() + '.pdf');
+        } catch (error) {
+          console.error(error);
+          alert('Unable to create the PDF. Please try again, or use your browser\'s Print > Save as PDF.');
+        } finally {
+          page.style.width = saved.width;
+          page.style.maxWidth = saved.maxWidth;
+          page.style.boxShadow = saved.shadow;
+          toolbar.style.display = saved.display;
+          btn.disabled = false;
+          btn.textContent = btnLabel;
+        }
+      }
+
+      document.getElementById('csvBtn').addEventListener('click', exportCSV);
+      document.getElementById('excelBtn').addEventListener('click', exportExcel);
+      document.getElementById('pdfBtn').addEventListener('click', exportPDF);
+
+      document.getElementById('backupBtn').addEventListener('click', saveBackup);
+      document.getElementById('restoreBtn').addEventListener('click', () => document.getElementById('restoreFile').click());
+      document.getElementById('restoreFile').addEventListener('change', (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (file) restoreBackup(file);
+        event.target.value = '';
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', async () => {
+        const payload = getFormData();
+        saveBackup(); // local JSON copy first, so nothing is lost if the service is unreachable
+
+        try {
+          const response = await fetch('/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ form: payload, submittedAt: new Date().toISOString() })
+          });
+
+          const result = await response.json();
+          alert(result.message || 'Submitted successfully');
+        } catch (error) {
+          console.error(error);
+          alert('Unable to submit to the microservice.');
+        }
+      });
+
+      updateScores();
+    </script>
+  </body>
+</html>
